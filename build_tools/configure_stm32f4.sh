@@ -73,6 +73,13 @@ case $2 in
     export PATH_TO_LINKER_SCRIPT="`realpath ../build_tools/stm32f746xg-cmsis.ld`"
     ;;
 
+  corstone-300)
+    echo "Building for Corstone-300"
+    export ARM_CPU="cortex-m55"
+    #export PATH_TO_LINKER_SCRIPT="`realpath ../third_party/ethos-u-core-platform/targets/corstone-300/platform.ld`"
+    export PATH_TO_LINKER_SCRIPT="`realpath .../build_tools/corstone-300-platform.ld`"
+    ;;
+
   *)
     echo "Unknown device. Use 'stm32f407', 'stm32f446', 'stm32f4xx' or 'stm32f746'"
     exit 1
