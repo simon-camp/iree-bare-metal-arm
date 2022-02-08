@@ -35,6 +35,20 @@ set(ARM_COMPILER_FLAGS)
 set(ARM_COMPILER_FLAGS_CXX)
 set(ARM_COMPILER_FLAGS_DEBUG)
 set(ARM_COMPILER_FLAGS_RELEASE)
+
+# Use the preprocessor on the generic linker script
+string(TOUPPER "${ARM_TARGET}" ARM_TARGET)
+if(ARM_TARGET STREQUAL "CORSTONE-300")
+  set(PROCESSED_LINKER_SCRIPT "corstone-300-plattform.ld")
+  add_custom_command(
+    OUTPUT ${PROCESSED_LINKER_SCRIPT}
+    COMMAND ${CMAKE_C_COMPILER} ARGS -E -P -x c -o ${PROCESSED_LINKER_SCRIPT} ${LINKER_SCRIPT}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    COMMENT "Preprocessing linker script"
+  )
+  #set(${LINKER_SCRIPT} ${PROCESSED_LINKER_SCRIPT})
+endif()
+
 set(ARM_LINKER_FLAGS "-lc -lm ${CUSTOM_ARM_LINKER_FLAGS} -T ${LINKER_SCRIPT}")
 set(ARM_LINKER_FLAGS_EXE)
 
@@ -46,6 +60,8 @@ elseif(ARM_CPU STREQUAL "cortex-m7" OR ARM_CPU STREQUAL "cortex-m7-sp")
 elseif(ARM_CPU STREQUAL "cortex-m7-dp")
   # Single- and double-precision FPU
   list(APPEND ARM_COMPILER_FLAGS "-mthumb -march=armv7e-m -mfloat-abi=hard -mfpu=fpv5-d16 -DIREE_TIME_NOW_FN=\"\{ return 0; \}\" -Wl,--gc-sections -ffunction-sections -fdata-sections")
+elseif(ARM_CPU STREQUAL "cortex-m55")
+  list(APPEND ARM_COMPILER_FLAGS "-mthumb -march=armv8.1-m -mfloat-abi=hard -mfpu=auto -DIREE_TIME_NOW_FN=\"\{ return 0; \}\" -Wl,--gc-sections -ffunction-sections -fdata-sections")
 endif()
 
 set(CMAKE_C_FLAGS             "${ARM_COMPILER_FLAGS} ${CMAKE_C_FLAGS}")
