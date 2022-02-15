@@ -17,7 +17,7 @@ fi
 case $1 in
   cmsis)
     echo "Building with CMSIS"
-    export CUSTOM_ARM_LINKER_FLAGS="-lnosys"
+    export CUSTOM_ARM_LINKER_FLAGS=""
     export BUILD_WITH="CMSIS"
     ;;
   
@@ -75,9 +75,10 @@ case $2 in
 
   corstone-300)
     echo "Building for Corstone-300"
-    export ARM_CPU="cortex-m55"
+    export ARM_CPU="cortex-m4"
     #export PATH_TO_LINKER_SCRIPT="`realpath ../third_party/ethos-u-core-platform/targets/corstone-300/platform.ld`"
-    export PATH_TO_LINKER_SCRIPT="`realpath .../build_tools/corstone-300-platform.ld`"
+    # export PATH_TO_LINKER_SCRIPT="`realpath ../build_tools/corstone-300-platform.ld`"
+    export PATH_TO_LINKER_SCRIPT="`realpath ../build_tools/corstone-300-platform-customized.ld`"
     ;;
 
   *)

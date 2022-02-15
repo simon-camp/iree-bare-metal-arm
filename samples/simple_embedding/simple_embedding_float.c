@@ -42,6 +42,8 @@ iree_status_t Run() {
       iree_hal_module_create(device, iree_allocator_system(), &hal_module));
 
   // Load bytecode module from the embedded data.
+  // This line does not seem to finish in FVP.
+#if 0
   const iree_const_byte_span_t module_data = load_bytecode_module_data();
 
   iree_vm_module_t* bytecode_module = NULL;
@@ -144,6 +146,7 @@ iree_status_t Run() {
   iree_hal_device_release(device);
   iree_vm_context_release(context);
   iree_vm_instance_release(instance);
+#endif
   return iree_ok_status();
 }
 
@@ -159,6 +162,7 @@ int main(void) {
   printf("Running simple_embedding...\n");
 
   const iree_status_t result = Run();
+#if 0
   int ret = (int)iree_status_code(result);
   if (!iree_status_is_ok(result)) {
     iree_status_fprint(stderr, result);
@@ -167,9 +171,10 @@ int main(void) {
     printf("Execution succesfull!\n");
   }
   printf("simple_embedding done\n");
+#endif
 
-  while (1) {
-  }
+  // while (1) {
+  // }
 
   return 0;
 }
