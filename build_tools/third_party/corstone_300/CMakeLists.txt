@@ -29,3 +29,6 @@ set(SYSTEM_CORE_CLOCK "25000000"   CACHE STRING "System core clock (Hz)")
 configure_file("${ethos_u_core_platform_SOURCE_DIR}/drivers/uart/uart_config.h.in" "${CMAKE_CURRENT_BINARY_DIR}/uart_config.h")
 
 target_compile_definitions(corstone_300 PUBLIC -DARMCM4_FP)
+
+# Allow ld to find generic linker script
+target_link_directories(corstone_300 INTERFACE "${PROJECT_SOURCE_DIR}/build_tools/")

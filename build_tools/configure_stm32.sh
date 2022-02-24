@@ -86,6 +86,14 @@ case $2 in
     # export PATH_TO_LINKER_SCRIPT="`realpath ../build_tools/corstone-300-platform.ld`"
     export PATH_TO_LINKER_SCRIPT="`realpath ../build_tools/corstone-300-platform-customized.ld`"
     ;;
+  
+  corstone-300-cmsis)
+    echo "Building for Corstone-300 with CMSIS linker script"
+    export ARM_CPU="cortex-m4"
+    #export PATH_TO_LINKER_SCRIPT="`realpath ../third_party/ethos-u-core-platform/targets/corstone-300/platform.ld`"
+    # export PATH_TO_LINKER_SCRIPT="`realpath ../build_tools/corstone-300-platform.ld`"
+    export PATH_TO_LINKER_SCRIPT="`realpath ../build_tools/corstone-300-cmsis.ld`"
+    ;;
 
   *)
     echo "Unknown device. Use 'stm32f303xe' 'stm32f407', 'stm32f446', 'stm32f4xx' or 'stm32f746'"
@@ -121,9 +129,10 @@ cmake -GNinja \
       -DARM_TARGET="${2^^}" \
       -DIREE_ERROR_ON_MISSING_SUBMODULES=OFF \
       -DIREE_HAL_DRIVER_DEFAULTS=OFF \
-      -DIREE_HAL_DRIVER_DYLIB_SYNC=ON \
+      -DIREE_HAL_DRIVER_DYLIB_SYNC=OFF \
       -DIREE_HAL_DRIVER_VMVX_SYNC=ON \
       -DIREE_HOST_BINARY_ROOT="${PATH_TO_IREE_HOST_BINARY_ROOT}" \
       -DCUSTOM_ARM_LINKER_FLAGS="${CUSTOM_ARM_LINKER_FLAGS}" \
       -DLINKER_SCRIPT="${PATH_TO_LINKER_SCRIPT}" \
+      -DCMAKE_BUILD_TYPE=Debug \
       ..
