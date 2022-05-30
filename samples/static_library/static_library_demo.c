@@ -9,8 +9,8 @@
 
 #include <stdio.h>
 
+#include "iree/hal/drivers/local_sync/sync_device.h"
 #include "iree/hal/local/loaders/static_library_loader.h"
-#include "iree/hal/local/sync_device.h"
 #include "iree/modules/hal/module.h"
 #include "iree/runtime/api.h"
 
@@ -28,8 +28,6 @@ extern void print_success();
 // released by the caller.
 iree_status_t create_device_with_static_loader(iree_allocator_t host_allocator,
                                                iree_hal_device_t** out_device) {
-  iree_status_t status = iree_ok_status();
-
   // Set paramters for the device created in the next step.
   iree_hal_sync_device_params_t params;
   iree_hal_sync_device_params_initialize(&params);
@@ -39,12 +37,10 @@ iree_status_t create_device_with_static_loader(iree_allocator_t host_allocator,
       simple_mul_dispatch_0_library_query,
   };
   iree_hal_executable_loader_t* library_loader = NULL;
-  if (iree_status_is_ok(status)) {
-    status = iree_hal_static_library_loader_create(
+  iree_status_t status = iree_hal_static_library_loader_create(
         IREE_ARRAYSIZE(libraries), libraries,
         iree_hal_executable_import_provider_null(), host_allocator,
         &library_loader);
-  }
 
   // Use the default host allocator for buffer allocations.
   iree_string_view_t identifier = iree_make_cstring_view("sync");
@@ -127,7 +123,7 @@ iree_status_t Run() {
 
   if (iree_status_is_ok(status)) {
     status = iree_hal_buffer_view_allocate_buffer(
-        iree_hal_device_allocator(device), shape, IREE_ARRAYSIZE(shape),
+        iree_hal_device_allocator(device), IREE_ARRAYSIZE(shape), shape,
         IREE_HAL_ELEMENT_TYPE_FLOAT_32, IREE_HAL_ENCODING_TYPE_DENSE_ROW_MAJOR,
         (iree_hal_buffer_params_t){
             .type = IREE_HAL_MEMORY_TYPE_DEVICE_LOCAL,
@@ -140,7 +136,7 @@ iree_status_t Run() {
   }
   if (iree_status_is_ok(status)) {
     status = iree_hal_buffer_view_allocate_buffer(
-        iree_hal_device_allocator(device), shape, IREE_ARRAYSIZE(shape),
+        iree_hal_device_allocator(device), IREE_ARRAYSIZE(shape), shape,
         IREE_HAL_ELEMENT_TYPE_FLOAT_32, IREE_HAL_ENCODING_TYPE_DENSE_ROW_MAJOR,
         (iree_hal_buffer_params_t){
             .type = IREE_HAL_MEMORY_TYPE_DEVICE_LOCAL,
