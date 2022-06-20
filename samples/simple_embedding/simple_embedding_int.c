@@ -98,6 +98,9 @@ iree_status_t Run() {
       },
       iree_make_const_byte_span(kInt2, sizeof(kInt2)), &arg1_buffer_view));
 
+// With this additional print the `RelWithDebInfo` build fails to run. The `Debug`,
+// `Release` and `MinSizeRel` builds fail with the additional print commented out.
+printf("Additional print!\n");
   // Setup call inputs with our buffers.
   iree_vm_list_t* inputs = NULL;
   IREE_RETURN_IF_ERROR(iree_vm_list_create(
