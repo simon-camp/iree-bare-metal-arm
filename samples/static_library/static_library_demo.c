@@ -13,6 +13,29 @@
 #include "iree/hal/local/loaders/static_library_loader.h"
 #include "iree/modules/hal/module.h"
 #include "iree/runtime/api.h"
+#include "model.h"
+
+const model_t model = {
+    .name = "4 * 2 = 8",
+    .num_functions = 1,
+    .functions = (function_spec_t[]){
+        {.name = iree_string_view_literal("module.simple_mul"),
+         .num_inputs = 2,
+         .inputs =
+             (input_spec_t[]){
+                 (input_spec_t){
+                     .rank = 1,
+                     .shape = (iree_hal_dim_t[]){4},
+                     .element_type = IREE_HAL_ELEMENT_TYPE_FLOAT_32,
+                     .encoding_type = IREE_HAL_ENCODING_TYPE_DENSE_ROW_MAJOR},
+                 (input_spec_t){
+                     .rank = 1,
+                     .shape = (iree_hal_dim_t[]){4},
+                     .element_type = IREE_HAL_ELEMENT_TYPE_FLOAT_32,
+                     .encoding_type = IREE_HAL_ENCODING_TYPE_DENSE_ROW_MAJOR}},
+         .num_outputs = 1,
+         .outputs = (output_spec_t[]){
+             (output_spec_t){.data_length = 4 * sizeof(float)}}}}};
 
 extern const iree_hal_executable_library_header_t**
 simple_mul_dispatch_0_library_query(
@@ -106,44 +129,39 @@ iree_status_t Run() {
   }
 
   // Lookup the entry point function call.
-  const char kMainFunctionName[] = "module.simple_mul";
-  iree_runtime_call_t call;
-  memset(&call, 0, sizeof(call));
+  iree_runtime_call_t call = {0};
   if (iree_status_is_ok(status)) {
     status = iree_runtime_call_initialize_by_name(
-        session, iree_make_cstring_view(kMainFunctionName), &call);
+        session, model.functions[0].name, &call);
   }
 
-  // Populate initial values for 4 * 2 = 8.
-  const int kElementCount = 4;
-  iree_hal_dim_t shape[1] = {kElementCount};
   iree_hal_buffer_view_t* arg0_buffer_view = NULL;
   iree_hal_buffer_view_t* arg1_buffer_view = NULL;
   float kFloat4[] = {4.0f, 4.0f, 4.0f, 4.0f};
   float kFloat2[] = {2.0f, 2.0f, 2.0f, 2.0f};
 
   if (iree_status_is_ok(status)) {
+    input_spec_t input0 = model.functions[0].inputs[0];
     status = iree_hal_buffer_view_allocate_buffer(
-        iree_hal_device_allocator(device), IREE_ARRAYSIZE(shape), shape,
-        IREE_HAL_ELEMENT_TYPE_FLOAT_32, IREE_HAL_ENCODING_TYPE_DENSE_ROW_MAJOR,
+        iree_hal_device_allocator(device), input0.rank, input0.shape,
+        input0.element_type, input0.encoding_type,
         (iree_hal_buffer_params_t){
             .type = IREE_HAL_MEMORY_TYPE_DEVICE_LOCAL,
             .usage = IREE_HAL_BUFFER_USAGE_DEFAULT,
         },
-        iree_make_const_byte_span((void*)kFloat4,
-                                  sizeof(float) * kElementCount),
+        iree_make_const_byte_span((void*)kFloat4, sizeof(kFloat4)),
         &arg0_buffer_view);
   }
   if (iree_status_is_ok(status)) {
+    input_spec_t input1 = model.functions[0].inputs[1];
     status = iree_hal_buffer_view_allocate_buffer(
-        iree_hal_device_allocator(device), IREE_ARRAYSIZE(shape), shape,
-        IREE_HAL_ELEMENT_TYPE_FLOAT_32, IREE_HAL_ENCODING_TYPE_DENSE_ROW_MAJOR,
+        iree_hal_device_allocator(device), input1.rank, input1.shape,
+        input1.element_type, input1.encoding_type,
         (iree_hal_buffer_params_t){
             .type = IREE_HAL_MEMORY_TYPE_DEVICE_LOCAL,
             .usage = IREE_HAL_BUFFER_USAGE_DEFAULT,
         },
-        iree_make_const_byte_span((void*)kFloat2,
-                                  sizeof(float) * kElementCount),
+        iree_make_const_byte_span((void*)kFloat2, sizeof(kFloat2)),
         &arg1_buffer_view);
   }
 
